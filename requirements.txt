@@ -1,1 +1,10 @@
+transformers
+dataset
+optimum
+openai
 wandb
+json-repair
+faker
+accelerate
+hf_xet
+peft

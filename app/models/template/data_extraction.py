@@ -26,3 +26,4 @@ def detailed_extraction_template(story: str):
                 "```json"
             ])
         }]
+    return detailed_extraction_message
