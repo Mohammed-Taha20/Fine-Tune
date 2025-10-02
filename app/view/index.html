@@ -1,26 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
   <title>Model Comparison</title>
-  <script defer src="script.js"></script>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .results { display: flex; gap: 20px; margin-top: 20px; }
+    .card { flex: 1; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9; }
+    textarea { width: 100%; height: 80px; }
+    button { margin-top: 10px; padding: 10px; }
+  </style>
 </head>
 <body>
-  <h1>Compare Base vs Fine-tuned Model</h1>
-  
-  <textarea id="prompt" rows="5" cols="60" placeholder="Enter your prompt here..."></textarea><br>
-  <button id="send">Compare</button>
+  <h2>Compare Base vs Fine-Tuned Model</h2>
+  <textarea id="prompt" placeholder="Enter your prompt here"></textarea><br>
+  <button onclick="sendPrompt()">Generate</button>
 
   <div class="results">
-    <div class="result-box">
-      <h2>Base Model</h2>
-      <pre id="base"></pre>
+    <div class="card">
+      <h3>Base Model</h3>
+      <pre id="base_output"></pre>
     </div>
-    <div class="result-box">
-      <h2>Fine-tuned Model</h2>
-      <pre id="finetuned"></pre>
+    <div class="card">
+      <h3>Fine-Tuned Model</h3>
+      <pre id="finetuned_output"></pre>
     </div>
   </div>
+
+  <script>
+    async function sendPrompt() {
+      const prompt = document.getElementById("prompt").value;
+      const response = await fetch("http://localhost:8000/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt })
+      });
+      const data = await response.json();
+      document.getElementById("base_output").textContent = data.base_output;
+      document.getElementById("finetuned_output").textContent = data.finetuned_output;
+    }
+  </script>
 </body>
 </html>
