@@ -8,3 +8,6 @@ faker
 accelerate
 hf_xet
 peft
+fastapi
+uvicorn
+jinja2
