@@ -32,14 +32,17 @@ class RequestData(BaseModel):
 async def compare_models(data: RequestData):
     # Base model
     base_inputs = base_tokenizer(data.prompt, return_tensors="pt").to(base_model.device)
-    base_outputs = base_model.generate(**base_inputs, max_new_tokens=100)
+    base_outputs = base_model.generate(**base_inputs, max_new_tokens=1000)
     base_text = base_tokenizer.decode(base_outputs[0], skip_special_tokens=True)
+    print("Base output:", base_text)
+    print("Base model outputs",base_outputs )
 
     # Fine-tuned model
     finetuned_inputs = finetuned_tokenizer(data.prompt, return_tensors="pt").to(finetuned_model.device)
-    finetuned_outputs = finetuned_model.generate(**finetuned_inputs, max_new_tokens=100)
+    finetuned_outputs = finetuned_model.generate(**finetuned_inputs, max_new_tokens=1000)
     finetuned_text = finetuned_tokenizer.decode(finetuned_outputs[0], skip_special_tokens=True)
-
+    print("Finetuned model outputs" , finetuned_outputs)
+    print("Finetuned output:", finetuned_text)
     return {
         "base_model": base_text,
         "finetuned_model": finetuned_text
