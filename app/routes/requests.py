@@ -10,8 +10,8 @@ BASE_MODEL_PATH = r"/content/drive/MyDrive/Fine Tune adapter/base_model"
 FINETUNED_MODEL_PATH = r"/content/drive/MyDrive/Fine Tune adapter/finetuned_model"
 
 # Load both models + tokenizers
-base_tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL_PATH)
-finetuned_tokenizer = AutoTokenizer.from_pretrained(FINETUNED_MODEL_PATH)
+base_tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL_PATH, trust_remote_code=True)
+finetuned_tokenizer = AutoTokenizer.from_pretrained(FINETUNED_MODEL_PATH, trust_remote_code=True)
 
 base_model = AutoModelForCausalLM.from_pretrained(
     BASE_MODEL_PATH,
@@ -28,21 +28,27 @@ finetuned_model = AutoModelForCausalLM.from_pretrained(
 class RequestData(BaseModel):
     prompt: str
 
+
+
 @router.post("/compare/")
 async def compare_models(data: RequestData):
+    # Qwen prompt template
+    prompt = f"<|im_start|>user\n{data.prompt}<|im_end|>\n<|im_start|>assistant\n"
+
     # Base model
-    base_inputs = base_tokenizer(data.prompt, return_tensors="pt").to(base_model.device)
+    base_inputs = base_tokenizer(prompt, return_tensors="pt").to(base_model.device)
     base_outputs = base_model.generate(**base_inputs, max_new_tokens=1000)
     base_text = base_tokenizer.decode(base_outputs[0], skip_special_tokens=True)
     print("Base output:", base_text)
-    print("Base model outputs",base_outputs )
+    print("Base model outputs", base_outputs)
 
     # Fine-tuned model
-    finetuned_inputs = finetuned_tokenizer(data.prompt, return_tensors="pt").to(finetuned_model.device)
+    finetuned_inputs = finetuned_tokenizer(prompt, return_tensors="pt").to(finetuned_model.device)
     finetuned_outputs = finetuned_model.generate(**finetuned_inputs, max_new_tokens=1000)
     finetuned_text = finetuned_tokenizer.decode(finetuned_outputs[0], skip_special_tokens=True)
-    print("Finetuned model outputs" , finetuned_outputs)
+    print("Finetuned model outputs", finetuned_outputs)
     print("Finetuned output:", finetuned_text)
+
     return {
         "base_model": base_text,
         "finetuned_model": finetuned_text
