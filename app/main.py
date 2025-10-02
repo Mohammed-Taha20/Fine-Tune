@@ -2,13 +2,13 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from app.routes import compare
+from app.routes import requests
 import os
 
 app = FastAPI()
 
 # Register compare router
-app.include_router(compare.router)
+app.include_router(requests.router)
 
 # Path to "view" folder
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
