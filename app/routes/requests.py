@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 from transformers import AutoTokenizer, AutoModelForCausalLM
+from app.models.template.translate import translation_template
 import torch
 
 router = APIRouter()
@@ -27,26 +28,39 @@ finetuned_model = AutoModelForCausalLM.from_pretrained(
 
 class RequestData(BaseModel):
     prompt: str
-
-
+    targeted_language: str = "English"
 
 @router.post("/compare/")
 async def compare_models(data: RequestData):
-    # Qwen prompt template
-    prompt = f"<|im_start|>user\n{data.prompt}<|im_end|>\n<|im_start|>assistant\n"
+    # Use the same prompt for both models
+    prompt = translation_template(data.prompt, data.targeted_language)
 
     # Base model
     base_inputs = base_tokenizer(prompt, return_tensors="pt").to(base_model.device)
-    base_outputs = base_model.generate(**base_inputs, max_new_tokens=1000)
-    base_text = base_tokenizer.decode(base_outputs[0], skip_special_tokens=True)
+    base_outputs = base_model.generate(
+        base_inputs.input_ids,
+        max_new_tokens=1024,
+        do_sample=False
+    )
+    base_generated_ids = [
+        output_ids[len(input_ids):]
+        for input_ids, output_ids in zip(base_inputs.input_ids, base_outputs)
+    ]
+    base_text = base_tokenizer.batch_decode(base_generated_ids, skip_special_tokens=True)[0]
     print("Base output:", base_text)
-    print("Base model outputs", base_outputs)
 
-    # Fine-tuned model
+    # Finetuned model (same prompt and logic)
     finetuned_inputs = finetuned_tokenizer(prompt, return_tensors="pt").to(finetuned_model.device)
-    finetuned_outputs = finetuned_model.generate(**finetuned_inputs, max_new_tokens=1000)
-    finetuned_text = finetuned_tokenizer.decode(finetuned_outputs[0], skip_special_tokens=True)
-    print("Finetuned model outputs", finetuned_outputs)
+    finetuned_outputs = finetuned_model.generate(
+        finetuned_inputs.input_ids,
+        max_new_tokens=1024,
+        do_sample=False
+    )
+    finetuned_generated_ids = [
+        output_ids[len(input_ids):]
+        for input_ids, output_ids in zip(finetuned_inputs.input_ids, finetuned_outputs)
+    ]
+    finetuned_text = finetuned_tokenizer.batch_decode(finetuned_generated_ids, skip_special_tokens=True)[0]
     print("Finetuned output:", finetuned_text)
 
     return {
