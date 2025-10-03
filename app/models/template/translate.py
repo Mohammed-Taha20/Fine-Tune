@@ -1,5 +1,5 @@
 import json
-from schema import translatedStory
+from app.models.schema import translatedStory
 
 def translation_template(story: str, Targeted_language: str = "English"):
     detailed_extraction_message = [
