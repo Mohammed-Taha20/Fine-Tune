@@ -1,1 +1,1 @@
-from app.models.schema import NewsDetails, translatedStory
+from app.models.schema.data_schema import NewsDetails, translatedStory
