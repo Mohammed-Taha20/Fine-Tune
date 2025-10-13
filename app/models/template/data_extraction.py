@@ -1,5 +1,5 @@
 import json
-from schema import NewsDetails
+from app.models.schema import NewsDetails
 def detailed_extraction_template(story: str):
     
     detailed_extraction_message = [{
@@ -26,3 +26,4 @@ def detailed_extraction_template(story: str):
                 "```json"
             ])
         }]
+    return detailed_extraction_message

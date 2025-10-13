@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Model Comparison</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <h2>Compare Base vs Fine-Tuned Model</h2>
+  <textarea id="prompt" placeholder="Enter your prompt here"></textarea><br>
+  <button id="send">Generate</button>
+
+  <div class="results">
+    <div class="result-box">
+      <h3>Base Model</h3>
+      <pre id="base"></pre>
+    </div>
+    <div class="result-box">
+      <h3>Fine-Tuned Model</h3>
+      <pre id="finetuned"></pre>
+    </div>
+  </div>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>
